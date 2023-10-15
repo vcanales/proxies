@@ -4,16 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start index.js --name proxier",
-    "stop": "pm2 stop proxier",
+    "start": "index.js start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "commander": "^11.1.0",
-    "pm2": "^5.3.0"
+    "commander": "^11.1.0"
   },
   "devDependencies": {
     "eslint": "^8.51.0",

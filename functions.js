@@ -1,5 +1,5 @@
 import { exec, spawn } from 'child_process';
-import { appendFile, readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 
 const config = {
