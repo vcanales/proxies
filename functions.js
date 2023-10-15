@@ -13,6 +13,7 @@ export function start() {
 		'-NvD', PROXY_PORT,
 		'-M', '-S', 'ssh-socks-proxy-8080',
 		'-fnT', '-i', KEY_PATH,
+		'-o', 'UserKnownHostsFile="/Applications/AutoProxxy.app/Contents/Resources/ProxyHostKey.pub"',
 		'-p', '22',
 		'-vvv',
 		'-E', 'ssh.log',
