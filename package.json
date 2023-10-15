@@ -6,13 +6,15 @@
   "scripts": {
     "start": "./index.js start",
     "stop": "./index.js stop",
+    "status": "./index.js status",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "commander": "^11.1.0"
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "eslint": "^8.51.0",
