@@ -12,7 +12,6 @@ function start() {
 		'-NvD', '8080',
 		'-M', '-S', CONTROL_SOCKET,
 		'-fnT', '-i', KEY_PATH,
-		'-o', 'UserKnownHostsFile="/Applications/AutoProxxy.app/Contents/Resources/ProxyHostKey.pub"',
 		'-p', PORT,
 		'-vvv',
 		'-E', 'ssh.log',
