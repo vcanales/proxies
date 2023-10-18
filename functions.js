@@ -16,7 +16,7 @@ const SSH_SOCKS_PROXY = path.join(__dirname, `ssh-socks-proxy-${PROXY_USER}-${PR
 
 export function start() {
 	const ss = status();
-	
+
 	if (ss) {
 		console.log('ssh proxy is already running');
 		return;
@@ -55,7 +55,7 @@ export function stop() {
 	}
 }
 
-export function status(returnPid = false) {
+export function status(returnPid = false, isVerbose = false) {
 	const pidFile = existsSync(PID_FILE);
 	const socksProxy = existsSync(SSH_SOCKS_PROXY);
 
@@ -70,6 +70,10 @@ export function status(returnPid = false) {
 	]);
 
 	const { stderr } = ssh;
+
+	if (isVerbose) {
+		console.log(stderr.toString());
+	}
 
 	if (stderr.includes('Master running')) {
 		if (returnPid) {
