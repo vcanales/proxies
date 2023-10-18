@@ -15,9 +15,9 @@ const SSH_LOG = path.join(__dirname, 'ssh.log');
 const SSH_SOCKS_PROXY = path.join(__dirname, `ssh-socks-proxy-${PROXY_USER}-${PROXY_PORT}`);
 
 export function start() {
-	const ss = status();
+	const isProxyAlreadyRunning = status();
 
-	if (ss) {
+	if (isProxyAlreadyRunning) {
 		console.log('ssh proxy is already running');
 		return;
 	}
@@ -84,6 +84,12 @@ export function status(returnPid = false, isVerbose = false) {
 	}
 
 	return false;
+}
+
+export function logs() {
+	const tail = spawn('tail', ['-f', SSH_LOG]);
+	tail.stdout.pipe(process.stdout);
+	tail.stderr.pipe(process.stderr);
 }
 
 

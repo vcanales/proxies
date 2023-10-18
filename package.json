@@ -7,6 +7,7 @@
     "start": "./index.js start",
     "stop": "./index.js stop",
     "status": "./index.js status",
+    "logs": "./index.js logs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
