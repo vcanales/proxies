@@ -14,12 +14,16 @@ const PID_FILE = path.join(__dirname, 'pid');
 const SSH_LOG = path.join(__dirname, 'ssh.log');
 const SSH_SOCKS_PROXY = path.join(__dirname, `ssh-socks-proxy-${PROXY_USER}-${PROXY_PORT}`);
 
-export function start() {
-	const isProxyAlreadyRunning = status();
+export function start(shouldRestart) {
+	if (shouldRestart) {
+		stop();
+	} else {
+		const isProxyAlreadyRunning = status();
 
-	if (isProxyAlreadyRunning) {
-		console.log('ssh proxy is already running');
-		return;
+		if (isProxyAlreadyRunning) {
+			console.log('ssh proxy is already running');
+			return;
+		}
 	}
 
 	// use spawn to run the ssh command above
