@@ -14,7 +14,29 @@ const PID_FILE = path.join(__dirname, 'pid');
 const SSH_LOG = path.join(__dirname, 'ssh.log');
 const SSH_SOCKS_PROXY = path.join(__dirname, `ssh-socks-proxy-${PROXY_USER}-${PROXY_PORT}`);
 
+export function readConfig() {
+	// read .env file and return the variables
+	const env = dotenv.config();
+	const { parsed } = env;
+	return parsed;
+}
+
+export function saveConfig(variables) {
+	// save variable values to .env file
+	const env = dotenv.config();
+	const { parsed } = env;
+	const newEnv = { ...parsed, ...variables };
+	const newEnvString = Object.keys(newEnv).map(key => `${key}=${newEnv[key]}`).join('\n');
+	writeFileSync(path.join(__dirname, '.env'), newEnvString);
+}
+
 export function start(shouldRestart, isVerbose) {
+	// check for env vars
+	if (!PROXY_HOST || !PROXY_PORT || !KEY_PATH || !PROXY_USER) {
+		console.log('Configuration variables are missing. Please run the `proxier config` command to set them.');
+		return;
+	}
+
 	if (shouldRestart) {
 		stop();
 	} else {

@@ -1,12 +1,23 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { logs, start, status, stop } from './functions.js';
+import inquirer from 'inquirer';
+import { readConfig, saveConfig, logs, start, status, stop } from './functions.js';
 
 const program = new Command();
 
 program
 	.option('-v, --verbose', 'Show verbose output');
+
+program
+	.command('config')
+	.description('Set the configuration variables')
+	.action(() => {
+		// Prompt for the variables
+		// Write the variables to the .env file
+		console.log('Setting configuration variables');
+		promptForEnvVariables();
+	});
 
 program
 	.command('start')
@@ -46,4 +57,44 @@ program
 		logs();
 	});
 
-	program.parse(process.argv);
+program.parse(process.argv);
+
+/*
+	Sets up the prompts for the configuration variables
+*/
+async function promptForEnvVariables() {
+	const defaults = readConfig();
+  const questions = [
+    {
+      type: 'input',
+      name: 'PROXY_HOST',
+      message: "What's your proxy host?",
+			default: defaults.PROXY_HOST 
+    },
+    {
+      type: 'input',
+      name: 'PROXY_PORT',
+      message: "What's your proxy port?",
+      default: defaults.PROXY_PORT || 8080
+    },
+    {
+      type: 'input',
+      name: 'PROXY_USER',
+      message: "What's your proxy user?",
+			default: defaults.PROXY_USER || ''
+    },
+    {
+      type: 'input',
+      name: 'KEY_PATH',
+      message: "What's the path to your SSH key?",
+			default: defaults.KEY_PATH || ''
+		},
+  ];
+
+  try {
+    const answers = await inquirer.prompt(questions);
+		saveConfig(answers);
+  } catch (error) {
+    console.error('Error prompting for environment variables:', error);
+  }
+}
