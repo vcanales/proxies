@@ -14,7 +14,7 @@ const PID_FILE = path.join(__dirname, 'pid');
 const SSH_LOG = path.join(__dirname, 'ssh.log');
 const SSH_SOCKS_PROXY = path.join(__dirname, `ssh-socks-proxy-${PROXY_USER}-${PROXY_PORT}`);
 
-export function start(shouldRestart) {
+export function start(shouldRestart, isVerbose) {
 	if (shouldRestart) {
 		stop();
 	} else {
@@ -27,20 +27,29 @@ export function start(shouldRestart) {
 	}
 
 	// use spawn to run the ssh command above
-	const ssh = spawn('ssh', [
-		'-NvD', PROXY_PORT,
-		'-M', '-S', SSH_SOCKS_PROXY,
-		'-fnT', '-i', KEY_PATH,
-		'-o', `UserKnownHostsFile="${PROXY_KEY}"`,
-		'-p', '22',
-		'-vvv',
-		'-E', SSH_LOG,
-		`${PROXY_USER}@${PROXY_HOST}`
-	], { detached: true });
+	try {
+		const ssh = spawn('ssh', [
+			'-NvD', PROXY_PORT,
+			'-M', '-S', SSH_SOCKS_PROXY,
+			'-fnT', '-i', KEY_PATH,
+			'-o', `UserKnownHostsFile="${PROXY_KEY}"`,
+			'-p', '22',
+			'-vvv',
+			'-E', SSH_LOG,
+			`${PROXY_USER}@${PROXY_HOST}`
+		], { detached: true });
 
-	writeFileSync(PID_FILE, `${ssh.pid}`);
+		if (isVerbose) {
+			ssh.stdout.pipe(process.stdout);
+			ssh.stderr.pipe(process.stderr);
+		}
 
-	ssh.unref();
+		writeFileSync(PID_FILE, `${ssh.pid}`);
+
+		ssh.unref();
+	} catch(err) {
+		console.log(err);
+	}
 }
 
 export function stop() {

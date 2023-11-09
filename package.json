@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "proxier": "index.js"
+  },
   "scripts": {
     "start": "./index.js start",
     "stop": "./index.js stop",
