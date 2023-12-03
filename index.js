@@ -89,6 +89,12 @@ async function promptForEnvVariables() {
       message: "What's the path to your SSH key?",
 			default: defaults.KEY_PATH || ''
 		},
+		{
+			type: 'input',
+			name: 'PAC_FILE_URL',
+			message: "What's the URL to your PAC file?",
+			default: defaults.PAC_FILE_URL || ''
+		}
   ];
 
   try {
