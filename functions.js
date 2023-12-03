@@ -12,7 +12,7 @@ const { PAC_FILE_URL = '', PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER } = proc
 const PROXY_KEY = path.join(__dirname, 'ProxyHostKey.pub');
 const PID_FILE = path.join(__dirname, 'pid');
 const SSH_LOG = path.join(__dirname, 'ssh.log');
-const SSH_SOCKS_PROXY = path.join(__dirname, `ssh-socks-proxy-${PROXY_USER}-${PROXY_PORT}`);
+const SSH_SOCKS_PROXY = path.join(__dirname, `socks-proxy-${PROXY_PORT}`);
 
 export function readConfig() {
 	// read .env file and return the variables
