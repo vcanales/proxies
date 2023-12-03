@@ -22,7 +22,7 @@ export function readConfig() {
 	}
 	const env = dotenv.config();
 	const { parsed } = env;
-	return parsed;
+	return parsed ?? {};
 }
 
 export function saveConfig(variables) {
