@@ -1,6 +1,6 @@
 {
   "name": "sproxier",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "ssh socks proxy manager",
   "main": "index.js",
   "bin": {
