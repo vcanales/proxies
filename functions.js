@@ -16,6 +16,10 @@ const SSH_SOCKS_PROXY = path.join(__dirname, `ssh-socks-proxy-${PROXY_USER}-${PR
 
 export function readConfig() {
 	// read .env file and return the variables
+	// create .env if it doesn't exist
+	if (!existsSync(path.join(__dirname, '.env'))) {
+		writeFileSync(path.join(__dirname, '.env'), '');
+	}
 	const env = dotenv.config();
 	const { parsed } = env;
 	return parsed;
@@ -23,6 +27,10 @@ export function readConfig() {
 
 export function saveConfig(variables) {
 	// save variable values to .env file
+	// create .env if it doesn't exist
+	if (!existsSync(path.join(__dirname, '.env'))) {
+		writeFileSync(path.join(__dirname, '.env'), '');
+	}
 	const env = dotenv.config();
 	const { parsed } = env;
 	const newEnv = { ...parsed, ...variables };
