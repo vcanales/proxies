@@ -8,7 +8,7 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const { PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER } = process.env;
+const { PAC_FILE_URL = '', PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER } = process.env;
 const PROXY_KEY = path.join(__dirname, 'ProxyHostKey.pub');
 const PID_FILE = path.join(__dirname, 'pid');
 const SSH_LOG = path.join(__dirname, 'ssh.log');
@@ -48,7 +48,17 @@ export function start(shouldRestart, isVerbose) {
 		}
 	}
 
-	// use spawn to run the ssh command above
+	// if macos, use networksetup to set automatic proxy config on
+	if (process.platform === 'darwin') {
+		try {
+			execSync(`networksetup -setautoproxyurl "Wi-Fi" ${PAC_FILE_URL}`);
+		} catch(err) {
+			console.log('Error setting automatic proxy config on');
+			return;
+		}
+	}
+
+	// use spawn to run the ssh command
 	try {
 		const ssh = spawn('ssh', [
 			'-NvD', PROXY_PORT,
@@ -80,6 +90,16 @@ export function stop() {
 	if (!pid) {
 		console.log('ssh proxy is not running');
 		return;
+	}
+
+	// if macos, use networksetup to set automatic proxy config off
+	if (process.platform === 'darwin') {
+		try {
+			execSync(`networksetup -setautoproxystate "Wi-Fi" off`);
+		} catch(err) {
+			console.log('Error setting automatic proxy config off');
+			return;
+		}
 	}
 	
 	try {
