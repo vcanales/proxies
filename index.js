@@ -64,6 +64,7 @@ program.parse(process.argv);
 */
 async function promptForEnvVariables() {
 	const defaults = readConfig();
+	console.log(defaults);
   const questions = [
     {
       type: 'input',

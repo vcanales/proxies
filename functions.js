@@ -4,41 +4,65 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const { PAC_FILE_URL = '', PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER } = process.env;
-const PROXY_KEY = path.join(__dirname, 'ProxyHostKey.pub');
-const PID_FILE = path.join(__dirname, 'pid');
-const SSH_LOG = path.join(__dirname, 'ssh.log');
-const SSH_SOCKS_PROXY = path.join(__dirname, `socks-proxy-${PROXY_PORT}`);
+const envPath = path.join(__dirname, '.env');
+
+function initEnv() {
+	dotenv.config(
+		{ path: envPath }
+	);
+
+	const { PAC_FILE_URL = '', PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER } = process.env;
+	const PROXY_KEY = path.join(__dirname, 'ProxyHostKey.pub');
+	const PID_FILE = path.join(__dirname, 'pid');
+	const SSH_LOG = path.join(__dirname, 'ssh.log');
+	const SSH_SOCKS_PROXY = path.join(__dirname, `socks-proxy-${PROXY_PORT}`);
+
+	return {
+		PAC_FILE_URL,
+		PROXY_HOST,
+		PROXY_PORT,
+		KEY_PATH,
+		PROXY_USER,
+		PROXY_KEY,
+		PID_FILE,
+		SSH_LOG,
+		SSH_SOCKS_PROXY
+	}
+}
 
 export function readConfig() {
 	// read .env file and return the variables
 	// create .env if it doesn't exist
-	if (!existsSync(path.join(__dirname, '.env'))) {
-		writeFileSync(path.join(__dirname, '.env'), '');
+	if (!existsSync(envPath)) {
+		writeFileSync(envPath, '');
 	}
-	const env = dotenv.config();
-	const { parsed } = env;
+	const env = dotenv.config({
+		path: envPath
+	});
+	const { parsed, error } = env;
+	if (error) {
+		throw error;
+	}
 	return typeof parsed == undefined ? {} : parsed;
 }
 
 export function saveConfig(variables) {
 	// save variable values to .env file
 	// create .env if it doesn't exist
-	if (!existsSync(path.join(__dirname, '.env'))) {
-		writeFileSync(path.join(__dirname, '.env'), '');
+	if (!existsSync(envPath)) {
+		writeFileSync(envPath, '');
 	}
 	const env = dotenv.config();
 	const { parsed } = env;
 	const newEnv = { ...parsed, ...variables };
 	const newEnvString = Object.keys(newEnv).map(key => `${key}=${newEnv[key]}`).join('\n');
-	writeFileSync(path.join(__dirname, '.env'), newEnvString);
+	writeFileSync(envPath, newEnvString);
 }
 
 export function start(shouldRestart, isVerbose) {
+	const { PAC_FILE_URL, PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER, PROXY_KEY, PID_FILE, SSH_LOG, SSH_SOCKS_PROXY } = initEnv();
 	// check for env vars
 	if (!PROXY_HOST || !PROXY_PORT || !KEY_PATH || !PROXY_USER) {
 		console.log('Configuration variables are missing. Please run the `proxier config` command to set them.');
@@ -119,6 +143,7 @@ export function stop() {
 }
 
 export function status(returnPid = false, isVerbose = false) {
+	const { PROXY_HOST, PROXY_USER, PID_FILE, SSH_SOCKS_PROXY } = initEnv();
 	const pidFile = existsSync(PID_FILE);
 	const socksProxy = existsSync(SSH_SOCKS_PROXY);
 
@@ -150,6 +175,7 @@ export function status(returnPid = false, isVerbose = false) {
 }
 
 export function logs() {
+	const { SSH_LOG } = initEnv();
 	const tail = spawn('tail', ['-f', SSH_LOG]);
 	tail.stdout.pipe(process.stdout);
 	tail.stderr.pipe(process.stderr);
