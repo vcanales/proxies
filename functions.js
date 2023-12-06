@@ -104,6 +104,7 @@ export function start(shouldRestart, isVerbose) {
 			'-M', '-S', SSH_SOCKS_PROXY,
 			'-fnT', '-i', KEY_PATH,
 			'-o', `UserKnownHostsFile="${PROXY_KEY}"`,
+			'-o', 'ServerAliveInterval=60',
 			'-p', '22',
 			'-vvv',
 			'-E', SSH_LOG,
