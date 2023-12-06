@@ -8,16 +8,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const envPath = path.join(__dirname, '.env');
 
-function initEnv() {
+function initEnv(debug = false) {
 	dotenv.config(
-		{ path: envPath }
+		{
+			path: envPath,
+			debug,
+	}
 	);
 
 	const { PAC_FILE_URL = '', PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER } = process.env;
 	const PROXY_KEY = path.join(__dirname, 'ProxyHostKey.pub');
 	const PID_FILE = path.join(__dirname, 'pid');
 	const SSH_LOG = path.join(__dirname, 'ssh.log');
-	const SSH_SOCKS_PROXY = path.join(__dirname, `socks-proxy-${PROXY_PORT}`);
+	const SSH_SOCKS_PROXY = path.join(__dirname, 'proxier-socks');
 
 	return {
 		PAC_FILE_URL,
@@ -62,7 +65,7 @@ export function saveConfig(variables) {
 }
 
 export function start(shouldRestart, isVerbose) {
-	const { PAC_FILE_URL, PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER, PROXY_KEY, PID_FILE, SSH_LOG, SSH_SOCKS_PROXY } = initEnv();
+	const { PAC_FILE_URL, PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER, PROXY_KEY, PID_FILE, SSH_LOG, SSH_SOCKS_PROXY } = initEnv(isVerbose);
 	// check for env vars
 	if (!PROXY_HOST || !PROXY_PORT || !KEY_PATH || !PROXY_USER) {
 		console.log('Configuration variables are missing. Please run the `proxier config` command to set them.');
@@ -143,7 +146,7 @@ export function stop() {
 }
 
 export function status(returnPid = false, isVerbose = false) {
-	const { PROXY_HOST, PROXY_USER, PID_FILE, SSH_SOCKS_PROXY } = initEnv();
+	const { PROXY_HOST, PROXY_USER, PID_FILE, SSH_SOCKS_PROXY } = initEnv(isVerbose);
 	const pidFile = existsSync(PID_FILE);
 	const socksProxy = existsSync(SSH_SOCKS_PROXY);
 
@@ -174,8 +177,8 @@ export function status(returnPid = false, isVerbose = false) {
 	return false;
 }
 
-export function logs() {
-	const { SSH_LOG } = initEnv();
+export function logs(isVerbose = false) {
+	const { SSH_LOG } = initEnv(isVerbose);
 	const tail = spawn('tail', ['-f', SSH_LOG]);
 	tail.stdout.pipe(process.stdout);
 	tail.stderr.pipe(process.stderr);

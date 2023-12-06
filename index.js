@@ -53,8 +53,9 @@ program
 	.command('logs')
 	.description('Show the logs of the proxy')
 	.action(() => {
+		const isVerbose = program.opts().verbose;
 		console.log('Showing proxy logs');
-		logs();
+		logs(isVerbose);
 	});
 
 program.parse(process.argv);
