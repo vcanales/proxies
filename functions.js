@@ -13,7 +13,7 @@ function initEnv(debug = false) {
 		{
 			path: envPath,
 			debug,
-	}
+		}
 	);
 
 	const { PAC_FILE_URL = '', PROXY_HOST, PROXY_PORT, KEY_PATH, PROXY_USER } = process.env;
@@ -41,13 +41,16 @@ export function readConfig() {
 	if (!existsSync(envPath)) {
 		writeFileSync(envPath, '');
 	}
+
 	const env = dotenv.config({
 		path: envPath
 	});
 	const { parsed, error } = env;
+
 	if (error) {
 		throw error;
 	}
+
 	return typeof parsed == undefined ? {} : parsed;
 }
 
@@ -69,7 +72,7 @@ export function start(shouldRestart, isVerbose) {
 	// check for env vars
 	if (!PROXY_HOST || !PROXY_PORT || !KEY_PATH || !PROXY_USER) {
 		console.log('Configuration variables are missing. Please run the `proxier config` command to set them.');
-		return;
+		return false;
 	}
 
 	if (shouldRestart) {
@@ -79,17 +82,18 @@ export function start(shouldRestart, isVerbose) {
 
 		if (isProxyAlreadyRunning) {
 			console.log('ssh proxy is already running');
-			return;
+			return false;
 		}
 	}
 
 	// if macos, use networksetup to set automatic proxy config on
 	if (process.platform === 'darwin') {
 		try {
+			// @todo: automatically detect the network interface, or allow the user to specify it
 			execSync(`networksetup -setautoproxyurl "Wi-Fi" ${PAC_FILE_URL}`);
 		} catch(err) {
-			console.log('Error setting automatic proxy config on');
-			return;
+			console.log('Error setting automatic proxy config on; please do so manually.');
+			return false;
 		}
 	}
 
@@ -114,8 +118,10 @@ export function start(shouldRestart, isVerbose) {
 		writeFileSync(PID_FILE, `${ssh.pid}`);
 
 		ssh.unref();
+		return true;
 	} catch(err) {
 		console.log(err);
+		return false;
 	}
 }
 
@@ -124,24 +130,25 @@ export function stop() {
 	
 	if (!pid) {
 		console.log('ssh proxy is not running');
-		return;
+		return false;
 	}
 
 	// if macos, use networksetup to set automatic proxy config off
 	if (process.platform === 'darwin') {
 		try {
+			// @todo: automatically detect the network interface, or allow the user to specify it
 			execSync(`networksetup -setautoproxystate "Wi-Fi" off`);
 		} catch(err) {
-			console.log('Error setting automatic proxy config off');
-			return;
+			console.log('Could not turn off automatic proxy config; please do so manually.');
 		}
 	}
 	
 	try {
 		execSync(`kill ${pid}`);
+		return true;
 	} catch(err) {
-		console.log('ssh process is not found.');
-		return;
+		console.error(err);
+		return false;
 	}
 }
 

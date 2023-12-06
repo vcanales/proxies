@@ -13,8 +13,6 @@ program
 	.command('config')
 	.description('Set the configuration variables')
 	.action(() => {
-		// Prompt for the variables
-		// Write the variables to the .env file
 		console.log('Setting configuration variables');
 		promptForEnvVariables();
 	});
@@ -25,8 +23,12 @@ program
 	.action(() => {
 		console.log('Starting proxy');
 		const isVerbose = program.opts().verbose;
-		start(false, isVerbose);
-		console.log('Proxy started');
+
+		if (start(false, isVerbose)) {
+			console.log('Proxy started');
+		} else {
+			console.log('Proxy failed to start');
+		}
 	});
 
 program
@@ -34,8 +36,11 @@ program
 	.description('Stop the proxy')
 	.action(() => {
 		console.log('Stopping proxy');
-		stop();
-		console.log('Proxy stopped');
+		if (stop()) {
+			console.log('Proxy stopped');
+		} else {
+			console.log('Proxy failed to stop');
+		}
 	});
 
 program
@@ -54,7 +59,6 @@ program
 	.description('Show the logs of the proxy')
 	.action(() => {
 		const isVerbose = program.opts().verbose;
-		console.log('Showing proxy logs');
 		logs(isVerbose);
 	});
 
@@ -65,7 +69,6 @@ program.parse(process.argv);
 */
 async function promptForEnvVariables() {
 	const defaults = readConfig();
-	console.log(defaults);
   const questions = [
     {
       type: 'input',
