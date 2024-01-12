@@ -24,10 +24,15 @@ program
 		console.log('Starting proxy');
 		const isVerbose = program.opts().verbose;
 
-		if (start(false, isVerbose)) {
-			console.log('Proxy started');
-		} else {
-			console.log('Proxy failed to start');
+		try {
+			const hasStarted = start(true, isVerbose);
+			if (hasStarted) {
+				console.log('Proxy started');
+			} else if (hasStarted === false) {
+				console.log('Proxy already running');
+			}
+		} catch(error) {
+			console.error('Proxy failed to start', error)
 		}
 	});
 

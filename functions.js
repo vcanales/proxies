@@ -93,7 +93,7 @@ export function start(shouldRestart, isVerbose) {
 			execSync(`networksetup -setautoproxyurl "Wi-Fi" ${PAC_FILE_URL}`);
 		} catch(err) {
 			console.log('Error setting automatic proxy config on; please do so manually.');
-			return false;
+			throw err;
 		}
 	}
 
@@ -122,17 +122,12 @@ export function start(shouldRestart, isVerbose) {
 		return true;
 	} catch(err) {
 		console.log(err);
-		return false;
+		throw err;
 	}
 }
 
 export function stop() {
 	const pid = status(true);
-	
-	if (!pid) {
-		console.log('ssh proxy is not running');
-		return false;
-	}
 
 	// if macos, use networksetup to set automatic proxy config off
 	if (process.platform === 'darwin') {
@@ -144,12 +139,17 @@ export function stop() {
 		}
 	}
 	
+	if (!pid) {
+		console.log('ssh proxy is not running');
+		return false;
+	}
+	
 	try {
 		execSync(`kill ${pid}`);
 		return true;
 	} catch(err) {
 		console.error(err);
-		return false;
+		throw err;
 	}
 }
 
