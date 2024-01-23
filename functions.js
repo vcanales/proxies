@@ -81,7 +81,6 @@ export function start(shouldRestart, isVerbose) {
 		const isProxyAlreadyRunning = status();
 
 		if (isProxyAlreadyRunning) {
-			console.log('ssh proxy is already running');
 			return false;
 		}
 	}
@@ -140,7 +139,6 @@ export function stop() {
 	}
 	
 	if (!pid) {
-		console.log('ssh proxy is not running');
 		return false;
 	}
 	
